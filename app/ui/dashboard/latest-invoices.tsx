@@ -1,17 +1,29 @@
+"use client"
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { lusitana } from '@/app/ui/fonts';
 // import { LatestInvoice } from '@/app/lib/definitions';
 import { fetchLatestInvoices } from '@/app/lib/data';
+import React from "react";
+import useSWR from "swr";
 
 // export default async function LatestInvoices({
 //   latestInvoices,
 // }: {
 //   latestInvoices: LatestInvoice[];
 // }) {
+
+const fetcher = (url:any) => fetch(url).then((res) => res.json());
+
 export default async function LatestInvoices() { // Make component async, remove the props
-  const latestInvoices = await fetchLatestInvoices(); // Fetch data inside the component
+  const { data, error, isLoading } = useSWR('/api/dashlatest', fetcher);
+  console.log("🚀 ~ LatestInvoices ~ data:", data)
+
+  if (error) return "An error has occurred.";
+  if (isLoading) return "Loading...";
+  // const latestInvoices = await fetchLatestInvoices(); // Fetch data inside the component
+  // console.log("🚀 ~ LatestInvoices ~ latestInvoices:", latestInvoices)
   return (
     <div className="flex w-full flex-col md:col-span-4">
       <h2 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
@@ -21,7 +33,7 @@ export default async function LatestInvoices() { // Make component async, remove
         {/* NOTE: comment in this code when you get to this point in the course */}
 
         <div className="bg-white px-6">
-          {latestInvoices.map((invoice, i) => {
+          {data.latest.map((invoice:any, i:any) => {
             return (
               <div
                 key={invoice.id}
